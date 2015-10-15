@@ -13,9 +13,9 @@ Add the Maven dependency:
 
 ```xml
 <dependency>
-  <groupId>org.springframework.data</groupId>
-  <artifactId>spring-data-aerospike</artifactId>
-  <version>1.5.0.RELEASE</version>
+<groupId>org.springframework.data</groupId>
+	<artifactId>spring-data-aerospike</artifactId>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -76,28 +76,12 @@ class ApplicationConfig extends AbstractAerospikeConfiguration {
 	}
 
 	public @Bean AerospikeTemplate aerospikeTemplate() {
-		return new AerospikeTemplate(aerospikeClient(), "bar");
+		return new AerospikeTemplate(aerospikeClient(), "test");
 	}
 }
 ```
 
-This sets up a connection to a local Aerospike instance and enables the detection of Spring Data repositories (through `@EnableAerospikeRepositories`). The same configuration would look like this in XML:
-
-```xml
-
-<bean id="template" class="org.springframework.data.aerospike.core.AerospikeTemplate">
-  <constructor-arg>
-    <bean class="com.aerospike.client.AerospikeClient">
-       <constructor-arg value="policy" />
-       <constructor-arg value="localhost" />
-       <constructor-arg value="3000" />
-    </bean>
-  </constructor-arg>
-  <constructor-arg value="database" />
-</bean>
-
-<aerospike:repositories base-package="com.acme.repository" />
-```
+This sets up a connection to a local Aerospike instance and enables the detection of Spring Data repositories (through `@EnableAerospikeRepositories`).
 
 This will find the repository interface and register a proxy object in the container. You can use it as shown below:
 
