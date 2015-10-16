@@ -209,8 +209,7 @@ public class MyService {
 Here are some ways for you to get involved in the community:
 
 * Get involved with the Spring community on Stackoverflow and help out on the [spring-data-Aerospike](http://stackoverflow.com/questions/tagged/spring-data-Aerospike) tag by responding to questions and joining the debate.
-* Create [JIRA](https://jira.springframework.org/browse/DATADOC) tickets for bugs and new features and comment and vote on the ones that you are interested in.  
-* Github is for social coding: if you want to write code, we encourage contributions through pull requests from [forks of this repository](http://help.github.com/forking/). If you want to contribute code this way, please reference a JIRA ticket as well covering the specific issue you are addressing.
 * Watch for upcoming articles on Spring by [subscribing](http://spring.io/blog) to spring.io.
 
-Before we accept a non-trivial patch or pull request we will need you to sign the [contributor's agreement](https://support.springsource.com/spring_committer_signup).  Signing the contributor's agreement does not grant anyone commit rights to the main repository, but it does mean that we can accept your contributions, and you will get an author credit if we do.  Active contributors might be asked to join the core team, and given the ability to merge pull requests.
+## A more robust example is available on GitHub 
+A Spring Boot Web Application example that uses Spring boot, Thymeleaf, Spring MVC, Tomcat and Aerospike is available on GitHub [spring-boot-web-aerospike-application](https://github.com/carosys/spring-boot-web-aerospike-application)
