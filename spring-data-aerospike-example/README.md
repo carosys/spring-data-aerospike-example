@@ -144,11 +144,12 @@ To simplify the creation of data repositories Spring Data Aerospike provides a g
 For example, given a `Person` class with first and last name properties, a `PersonRepository` interface that can query for `Person` by last name and when the first name matches a like expression is shown below:
 
 ```java
-public interface PersonRepository extends CrudRepository<Person, Long> {
+	public interface PersonRepository extends AerospikeRepository<Person, String> {
 
-  List<Person> findByLastname(String lastname);
+		List<Person> findByName(String name);
 
-  List<Person> findByFirstnameLike(String firstname);
+		List<Person> findByNameStartsWith(String prefix);
+
 }
 ```
 
@@ -158,19 +159,20 @@ You can have Spring automatically create a proxy for the interface by using the 
 
 ```java
 @Configuration
-@EnableAerospikeRepositories(basePackageClasses = ContactRepository.class)
-class ApplicationConfig extends AbstractAerospikeConfiguration {
+@EnableAerospikeRepositories(basePackages = "example.springdata.aerospike")
+public class TestRepositoryConfig {
 	public @Bean(destroyMethod = "close") AerospikeClient aerospikeClient() {
 
 		ClientPolicy policy = new ClientPolicy();
 		policy.failIfNotConnected = true;
 
-		return new AerospikeClient(policy, "localhost", 3000);
+		return new AerospikeClient(policy, "127.0.0.1", 3000);
 	}
 
 	public @Bean AerospikeTemplate aerospikeTemplate() {
 		return new AerospikeTemplate(aerospikeClient(), "test");
 	}
+
 }
 ```
 
@@ -179,28 +181,85 @@ This sets up a connection to a local Aerospike instance and enables the detectio
 This will find the repository interface and register a proxy object in the container. You can use it as shown below:
 
 ```java
-@Service
-public class MyService {
+public class RepositoryExample {
 
-  private final PersonRepository repository;
+	@Autowired
+	protected PersonRepository repository;
 
-  @Autowired
-  public MyService(PersonRepository repository) {
-    this.repository = repository;
-  }
+	@Autowired
+	AerospikeOperations aerospikeOperations;
 
-  public void doWork() {
+	@Autowired
+	AerospikeClient client;
 
-     repository.deleteAll();
+	/**
+	 * @param ctx
+	 */
+	public RepositoryExample(ApplicationContext ctx) {
+		aerospikeOperations = ctx.getBean(AerospikeTemplate.class);
+		repository = (PersonRepository) ctx.getBean("personRepository");
+		client = ctx.getBean(AerospikeClient.class);
+	}
 
-     Person person = new Person();
-     person.setFirstname("Oliver");
-     person.setLastname("Gierke");
-     person = repository.save(person);
+	/**
+	 * @param args
+	 */
+	protected void setUp() {
 
-     List<Person> lastNameResults = repository.findByLastname("Gierke");
-     List<Person> firstNameResults = repository.findByFirstnameLike("Oli*");
- }
+		repository.deleteAll();
+
+		Person dave = new Person("Dave-01", "Matthews", 42);
+		Person donny = new Person("Dave-02", "Macintire", 39);
+		Person oliver = new Person("Oliver-01", "Matthews", 4);
+		Person carter = new Person("Carter-01", "Beauford", 49);
+		Person boyd = new Person("Boyd-01", "Tinsley", 45);
+		Person stefan = new Person("Stefan-01", "Lessard", 34);
+		Person leroi = new Person("Leroi-01", "Moore", 41);
+		Person leroi2 = new Person("Leroi-02", "Moore", 25);
+		Person alicia = new Person("Alicia-01", "Keys", 30);
+
+		repository.createIndex(Person.class, "person_name_index_repository", "name",IndexType.STRING);
+
+		List<Person> all = (List<Person>) repository.save(Arrays.asList(oliver,
+				dave, donny, carter, boyd, stefan, leroi, leroi2, alicia));
+
+	}
+
+	/**
+	 * @param args
+	 */
+	protected void cleanUp() {
+
+		repository.deleteAll();
+
+	}
+
+	/**
+	 * 
+	 */
+	protected void executeRepositoryCall() {
+		List<Person> result = repository.findByName("Beauford");
+		System.out.println("Results for exact match of 'Beauford'");
+		for (Person person : result) {
+			System.out.println(person.toString());
+		}
+		System.out.println("Results for name startting with letter 'M'");
+		List<Person> resultPartial = repository.findByNameStartsWith("M");
+		for (Person person : resultPartial) {
+			System.out.println(person.toString());
+		}
+	}
+
+	public static void main(String[] args) {
+
+		ApplicationContext ctx = new AnnotationConfigApplicationContext(TestRepositoryConfig.class);
+		RepositoryExample repositoryExample = new RepositoryExample(ctx);
+		repositoryExample.setUp();
+		repositoryExample.executeRepositoryCall();
+		repositoryExample.cleanUp();
+
+	}
+
 }
 ```
 

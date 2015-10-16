@@ -62,8 +62,7 @@ public class RepositoryExample {
 		Person leroi2 = new Person("Leroi-02", "Moore", 25);
 		Person alicia = new Person("Alicia-01", "Keys", 30);
 
-		repository.createIndex(Person.class, "person_name_index", "name",
-				IndexType.STRING);
+		repository.createIndex(Person.class, "person_name_index_repository", "name",IndexType.STRING);
 
 		List<Person> all = (List<Person>) repository.save(Arrays.asList(oliver,
 				dave, donny, carter, boyd, stefan, leroi, leroi2, alicia));

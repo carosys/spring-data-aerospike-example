@@ -25,8 +25,9 @@ public class TestRepositoryConfig {
 
 		ClientPolicy policy = new ClientPolicy();
 		policy.failIfNotConnected = true;
+		String localhost = "127.0.0.1";
 
-		return new AerospikeClient(policy, "52.23.205.208", 3000);
+		return new AerospikeClient(policy, localhost, 3000);
 	}
 
 	public @Bean AerospikeTemplate aerospikeTemplate() {
