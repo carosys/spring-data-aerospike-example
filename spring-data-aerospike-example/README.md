@@ -137,6 +137,57 @@ AerospikeTemplate is the central support class for Aerospike database operations
 * Connection affinity callback
 * Exception translation into Spring's [technology agnostic DAO exception hierarchy](http://docs.spring.io/spring/docs/current/spring-framework-reference/html/dao.html#dao-exceptions).
 
+#### Template Example
+```java
+public class AerospikeApp {
+
+	private static final Logger LOG = LoggerFactory
+			.getLogger(AerospikeApp.class);
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		try {
+			String localhost = "127.0.0.1";
+			AerospikeClient client = new AerospikeClient(null, localhost, 3000);
+			AerospikeTemplate aerospikeTemplate = new AerospikeTemplate(client,	"test");
+			aerospikeTemplate.delete(Person.class);
+			aerospikeTemplate.createIndex(Person.class,"Person_firstName_index_xx", "name", IndexType.STRING);
+			Person personSven01 = new Person("Sven-01", "ZName", 25);
+			Person personSven02 = new Person("Sven-02", "QName", 21);
+			Person personSven03 = new Person("Sven-03", "AName", 24);
+			Person personSven04 = new Person("Sven-04", "WName", 25);
+
+			
+
+			aerospikeTemplate.insert(personSven01);
+			aerospikeTemplate.insert(personSven02);
+			aerospikeTemplate.insert(personSven03);
+			aerospikeTemplate.insert(personSven04);
+
+			Query query = new Query(
+					Criteria.where("Person").is("WName", "name"));
+
+			Iterable<Person> it = aerospikeTemplate.find(query, Person.class);
+			int count = 0;
+			Person firstPerson = null;
+			for (Person person : it) {
+				firstPerson = person;
+				LOG.info(firstPerson.toString());
+				System.out.println(firstPerson.toString());
+				count++;
+			}
+		}
+		catch (AerospikeException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}
+```
 ### Spring Data repositories
 
 To simplify the creation of data repositories Spring Data Aerospike provides a generic repository programming model. It will automatically create a repository proxy for you that adds implementations of finder methods you specify on an interface.  
